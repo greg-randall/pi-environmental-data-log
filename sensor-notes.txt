@@ -1,0 +1,10 @@
+TSL2561:
+  Visible & IR Light Sensor:
+    https://github.com/ControlEverythingCommunity/TSL2561.git
+    
+    just using the python script.
+
+
+
+
+
