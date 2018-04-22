@@ -2,9 +2,13 @@ TSL2561:
   Visible & IR Light Sensor:
     https://github.com/ControlEverythingCommunity/TSL2561.git
     
-    just using the python script.
+    using the sample python
 
 
+BME680:
+  Temperature, Humidity, Pressure, VOC:
+    https://github.com/pimoroni/bme680
 
+    using the sample python
 
 
