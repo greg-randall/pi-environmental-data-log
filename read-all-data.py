@@ -4,10 +4,10 @@ import time
 import os.path
 
 #logging period in seconds:
-loggingperiod = 10
+loggingperiod = 2
 
 
-headers = "time & date, temperature F, pressure inch inHg, %RH, visible light lux, infrared light lux\n"
+headers = "time & date, temperature F, pressure inHg, %RH, visible light lux, infrared light lux\n"
 
 if os.path.exists("log.csv"):
   outputfile = open("log.csv","a")
