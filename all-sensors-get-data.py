@@ -9,14 +9,14 @@ import os.path
 ##########################################################
 
 #logging period in seconds:
-loggingperiod = 1
+loggingperiod = 0.5
 
 ##########################################################
 
 #setup sensors:
 #sound 
 soundsensor = Adafruit_ADS1x15.ADS1015()
-GAIN = 1
+GAIN = 1 #see datasheet for gain table, 1 = +/-4.096V
 soundsensor.start_adc(0, gain=GAIN)
 
 #light
@@ -41,11 +41,10 @@ headers = "time (central), date, temperature F, pressure inHg, %RH, voc ohm, vis
 
 if os.path.exists("log.csv"):
   outputfile = open("log.csv","a")
+  outputfile.write("system restarted\n")
 else:
   outputfile = open("log.csv","a")
   outputfile.write(headers)
-
-outputfile.write("system restarted\n")
 
 print headers
 
