@@ -40,17 +40,32 @@ adc.start_adc(0, gain=GAIN)
 # information and parameter description.
 
 # Read channel 0 for 5 seconds and print out its values.
-print('Reading ADS1x15 channel 0 for 90 seconds...')
+
+count = 0
+total = 0
+print('Reading ADS1x15 channel 0 for 15 seconds...')
 start = time.time()
-while (time.time() - start) <= 90.0:
+while (time.time() - start) <= 15.0:
     # Read the last ADC conversion value and print it out.
     value = adc.get_last_result()
+
+    value = value / 10
+
+    count = count + 1
+    total = total + value
+
     # WARNING! If you try to read any other ADC channel during this continuous
     # conversion (like by calling read_adc again) it will disable the
     # continuous conversion!
-    print('Channel 0: {0}'.format(value))
+    print('dBa: {0}'.format(value))
+    print count
     # Sleep for half a second.
     time.sleep(0.5)
 
 # Stop continuous conversion.  After this point you can't get data from get_last_result!
 adc.stop_adc()
+
+average = total / count
+
+print average
+print total
