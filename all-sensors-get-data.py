@@ -3,6 +3,7 @@ import smbus
 import bme680
 import Adafruit_ADS1x15
 
+from datetime import datetime
 import time
 import os.path
 
@@ -79,7 +80,7 @@ try:
 
 ##########################################################	
 
-    data = time.strftime("%X, %x", time.localtime()) + ", " + str(temperature) + ", " + str(pressure) + ", " + str(humidity) + ", " + str(voc) + ", " + str(visiblelight) + ", " + str(infraredlight) + ", " + str(sounddba)
+    data = datetime.now().strftime("%H:%M:%S.%f, %m/%d/%Y") + ", " + str(temperature) + ", " + str(pressure) + ", " + str(humidity) + ", " + str(voc) + ", " + str(visiblelight) + ", " + str(infraredlight) + ", " + str(sounddba)
     print data
 
     outputfile.write(data + "\n")
