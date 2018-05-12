@@ -5,12 +5,17 @@ import Adafruit_ADS1x15
 
 from datetime import datetime
 import time
-import os.path
+import os
+from ftplib import FTP
+import sys
+from ftpconfig import * #credentials for ftp. done this way to keep them from getting added to git
 
 ##########################################################
 
 #logging period in seconds:
 loggingperiod = 0.5
+#time to wait before uploading a csv in minutes
+uploadperiod = 60
 
 ##########################################################
 
@@ -51,8 +56,10 @@ print headers
 
 ##########################################################
 
+timeperiodstart = time.time()
 try:
   while True:
+
     #sound
     rawsound = soundsensor.get_last_result()
     sounddba = rawsound / 10.0
@@ -86,6 +93,38 @@ try:
     outputfile.write(data + "\n")
 
     time.sleep(loggingperiod)
+
+    if time.time() - timeperiodstart >= uploadperiod * 60:
+      outputfile.close()
+      
+
+      newfilename = str(datetime.now().strftime("log_%H-%M-%S_%m-%d-%Y.csv"))
+      print newfilename
+      os.rename("log.csv", newfilename)
+
+      ftp = FTP()
+      ftp.connect(SERVER, PORT)
+      ftp.login(USER, PASS)
+
+      filelist = []
+      ftp.retrlines('LIST', filelist.append)
+      found = False
+      for f in filelist:
+        if f.split()[-1] == 'pi-env-data' and f.lower().startswith('d'):
+          found = True
+      if not found:
+        ftp.mkd('pi-env-data')
+      ftp.cwd('pi-env-data')
+	
+      ftp.storbinary('STOR ' + newfilename, open(newfilename))
+      ftp.close()
+
+      outputfile = open("log.csv","a")
+      outputfile.write(headers)
+
+      timeperiodstart = time.time()
+
+
  
 except KeyboardInterrupt:
   pass
