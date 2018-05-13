@@ -39,12 +39,17 @@ enviromentalsensor.select_gas_heater_profile(0)
 
 headers = "time (central), date, temperature F, pressure inHg, %RH, voc ohm, visible light lux, infrared light lux, sound dBa\n"
 
-if os.path.exists("log.csv"):
-  outputfile = open("log.csv","a")
+if os.path.exists("data/log.csv"):
+  outputfile = open("data/log.csv","a")
   outputfile.write("system restarted\n")
 else:
-  outputfile = open("log.csv","a")
-  outputfile.write(headers)
+  if os.path.isdir("data"):
+    outputfile = open("data/log.csv","a")
+    outputfile.write(headers)
+  else:
+    os.mkdir("data")
+    outputfile = open("data/log.csv","a")
+    outputfile.write(headers)
 
 print headers
 
@@ -92,9 +97,10 @@ try:
       outputfile.close()
       
 
-      newfilename = str(datetime.now().strftime("log_%H-%M-%S_%m-%d-%Y.csv"))
+      newfilename = str(datetime.now().strftime("log_%m-%d-%Y_%H-%M-%S.csv"))
+      
       print newfilename
-      os.rename("log.csv", newfilename)
+      os.rename("data/log.csv", "data/" + newfilename)
 
       ftp = FTP()
       ftp.connect(SERVER, PORT)
@@ -110,13 +116,15 @@ try:
         ftp.mkd('pi-env-data')
       ftp.cwd('pi-env-data')
 	
-      ftp.storbinary('STOR ' + newfilename, open(newfilename))
+      ftp.storbinary('STOR ' + newfilename, open("data/" + newfilename))
       ftp.close()
 
-      outputfile = open("log.csv","a")
+      outputfile = open("data/log.csv","a")
       outputfile.write(headers)
 
       timeperiodstart = time.time()
+      
+      print "Log Uploaded to FTP Server"
 
 
  
