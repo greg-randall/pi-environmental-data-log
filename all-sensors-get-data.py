@@ -9,13 +9,7 @@ import os
 from ftplib import FTP
 import sys
 from ftpconfig import * #credentials for ftp. done this way to keep them from getting added to git
-
-##########################################################
-
-#logging period in seconds:
-loggingperiod = 0.5
-#time to wait before uploading a csv in minutes
-uploadperiod = 60
+from loggingperiodconfig import *
 
 ##########################################################
 
