@@ -11,6 +11,7 @@ import sys
 from ftpconfig import * #credentials for ftp. done this way to keep them from getting added to git
 from loggingperiodconfig import *
 
+
 ##########################################################
 
 #setup sensors:
@@ -94,38 +95,40 @@ try:
     time.sleep(loggingperiod)
 
     if time.time() - timeperiodstart >= uploadperiod * 60:
-      outputfile.close()
-      
+      try:
+        
+        ftp = FTP()
+        ftp.connect(SERVER, PORT)
+        ftp.login(USER, PASS)
 
-      newfilename = str(datetime.now().strftime("log_%m-%d-%Y_%H-%M-%S.csv"))
-      
-      print newfilename
-      os.rename("data/log.csv", "data/" + newfilename)
+        outputfile.close()
+     
+        newfilename = str(datetime.now().strftime("log_%m-%d-%Y_%H-%M-%S.csv"))
+     
+        os.rename("data/log.csv", "data/" + newfilename)
 
-      ftp = FTP()
-      ftp.connect(SERVER, PORT)
-      ftp.login(USER, PASS)
-
-      filelist = []
-      ftp.retrlines('LIST', filelist.append)
-      found = False
-      for f in filelist:
-        if f.split()[-1] == 'pi-env-data' and f.lower().startswith('d'):
-          found = True
-      if not found:
-        ftp.mkd('pi-env-data')
-      ftp.cwd('pi-env-data')
+        filelist = []
+        ftp.retrlines('LIST', filelist.append)
+        found = False
+        for f in filelist:
+          if f.split()[-1] == 'pi-env-data' and f.lower().startswith('d'):
+            found = True
+        if not found:
+          ftp.mkd('pi-env-data')
+        ftp.cwd('pi-env-data')
 	
-      ftp.storbinary('STOR ' + newfilename, open("data/" + newfilename))
-      ftp.close()
+        ftp.storbinary('STOR ' + newfilename, open("data/" + newfilename))
+        ftp.close()
 
-      outputfile = open("data/log.csv","a")
-      outputfile.write(headers)
+        outputfile = open("data/log.csv","a")
+        outputfile.write(headers)
 
-      timeperiodstart = time.time()
+        timeperiodstart = time.time()
       
-      print "Log Uploaded to FTP Server"
-
+        print "Log Uploaded to " + SERVER + ": " + newfilename
+      except:
+        print SERVER + " not available. Will retry upload in " + str(uploadperiod) + " minutes."
+	timeperiodstart = time.time()
 
  
 except KeyboardInterrupt:
