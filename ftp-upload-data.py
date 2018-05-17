@@ -7,6 +7,7 @@ from ftpconfig import * #credentials for ftp. done this way to keep them from ge
 while True:
   filestoupload = os.listdir('data/upload')
   if len(filestoupload)>0:
+    print "Found " + str(len(filestoupload)) + " file(s) to upload: "
     try:
       ftp = FTP()
       ftp.connect(SERVER, PORT)
@@ -27,14 +28,13 @@ while True:
         ftp.mkd('pi-env-data')
         ftp.cwd('pi-env-data')
     
-      print "Uploaded: \n"
       for f in filestoupload:
         print f + "\n" 
         ftp.storbinary('STOR ' + f, open("data/upload/" + f))
         os.rename("data/upload/" + f,"data/uploaded/" + f)
       ftp.close()
     except:
-      print SERVER + " not available. Will retry upload shortly."
+      print SERVER + " not available. Will retry shortly."
   
   print "Waiting 30 seconds. Current time: " + datetime.now().strftime("%H:%M:%S.%f")
   time.sleep(30)
