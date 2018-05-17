@@ -1,4 +1,5 @@
 import time
+from datetime import datetime
 import os
 from ftplib import FTP
 from ftpconfig import * #credentials for ftp. done this way to keep them from getting added to git
@@ -35,5 +36,5 @@ while True:
     except:
       print SERVER + " not available. Will retry upload shortly."
   
-  print "Waiting for 5 seconds"
-  time.sleep(5)
+  print "Waiting 30 seconds. Current time: " + datetime.now().strftime("%H:%M:%S.%f")
+  time.sleep(30)
