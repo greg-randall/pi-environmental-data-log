@@ -38,7 +38,7 @@ enviromentalsensor.select_gas_heater_profile(0)
 
 ##########################################################
 
-headers = "time (central), date, temperature F, pressure inHg, %RH, voc ohm, visible light lux, infrared light lux, sound dBa\n"
+headers = "time (central), date, cpu temperature C, temperature C, pressure kPa, %RH, voc ohm, visible light lux, infrared light lux, sound dBa\n"
 
 if os.path.exists("data/log.csv"):
   outputfile = open("data/log.csv","a")
@@ -51,6 +51,13 @@ else:
     os.mkdir("data")
     outputfile = open("data/log.csv","a")
     outputfile.write(headers)
+
+  if not os.path.isdir("data/upload"):
+    os.mkdir("data/upload")
+
+  if not os.path.isdir("data/uploaded"):
+    os.mkdir("data/uploaded")
+  
 
 print headers
 
@@ -75,19 +82,23 @@ try:
 
     #envriomental
     enviromentalsensor.get_sensor_data()
-    rawtemperature = enviromentalsensor.data.temperature
-    rawpressure = enviromentalsensor.data.pressure
+    temperature = enviromentalsensor.data.temperature
+    pressure = enviromentalsensor.data.pressure
     humidity = enviromentalsensor.data.humidity
-    temperature =  round((rawtemperature * 1.8) + 32,2)
-    pressure = round(rawpressure * 0.02953,4)
     if enviromentalsensor.data.heat_stable:
       voc = enviromentalsensor.data.gas_resistance
     else:
       voc = 0
 
+    #cpu temperature
+    cputemperature = os.popen("vcgencmd measure_temp").readline()
+    cputemperature = cputemperature.replace("temp=","")
+    cputemperature = float(cputemperature.replace("'C",""))
+
+
 ##########################################################	
 
-    data = datetime.now().strftime("%H:%M:%S.%f, %m/%d/%Y") + ", " + str(temperature) + ", " + str(pressure) + ", " + str(humidity) + ", " + str(voc) + ", " + str(visiblelight) + ", " + str(infraredlight) + ", " + str(sounddba)
+    data = datetime.now().strftime("%H:%M:%S.%f, %m/%d/%Y") + ", " + str(cputemperature) + ", " + str(temperature) + ", " + str(pressure) + ", " + str(humidity) + ", " + str(voc) + ", " + str(visiblelight) + ", " + str(infraredlight) + ", " + str(sounddba)
     print data
 
     outputfile.write(data + "\n")
@@ -95,41 +106,13 @@ try:
     time.sleep(loggingperiod)
 
     if time.time() - timeperiodstart >= uploadperiod * 60:
-      try:
-        
-        ftp = FTP()
-        ftp.connect(SERVER, PORT)
-        ftp.login(USER, PASS)
-
-        outputfile.close()
-     
-        newfilename = str(datetime.now().strftime("log_%m-%d-%Y_%H-%M-%S.csv"))
-     
-        os.rename("data/log.csv", "data/" + newfilename)
-
-        filelist = []
-        ftp.retrlines('LIST', filelist.append)
-        found = False
-        for f in filelist:
-          if f.split()[-1] == 'pi-env-data' and f.lower().startswith('d'):
-            found = True
-        if not found:
-          ftp.mkd('pi-env-data')
-        ftp.cwd('pi-env-data')
-	
-        ftp.storbinary('STOR ' + newfilename, open("data/" + newfilename))
-        ftp.close()
-
-        outputfile = open("data/log.csv","a")
-        outputfile.write(headers)
-
-        timeperiodstart = time.time()
-      
-        print "Log Uploaded to " + SERVER + ": " + newfilename
-      except:
-        print SERVER + " not available. Will retry upload in " + str(uploadperiod) + " minutes."
-	timeperiodstart = time.time()
-
+      outputfile.close()
+      newfilename = str(datetime.now().strftime("log_%m-%d-%Y_%H-%M-%S.csv"))
+      os.rename("data/log.csv", "data/upload/" + newfilename)
+      outputfile = open("data/log.csv","a")
+      outputfile.write(headers)
+      timeperiodstart = time.time()
+      print "Output CSV Split: " + newfilename
  
 except KeyboardInterrupt:
   pass
