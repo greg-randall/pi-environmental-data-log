@@ -103,16 +103,19 @@ try:
 
     outputfile.write(data + "\n")
 
-    time.sleep(loggingperiod)
-
     if time.time() - timeperiodstart >= uploadperiod * 60:
+      filesplittingtiming = time.time()
       outputfile.close()
       newfilename = str(datetime.now().strftime("log_%m-%d-%Y_%H-%M-%S.csv"))
       os.rename("data/log.csv", "data/upload/" + newfilename)
       outputfile = open("data/log.csv","a")
       outputfile.write(headers)
       timeperiodstart = time.time()
-      print "Output CSV Split: " + newfilename
+      print "Output CSV Split: " + newfilename + " "
+      timetakentosplit = time.time() - filesplittingtiming
+      time.sleep(loggingperiod-timetakentosplit)
+    else:
+      time.sleep(loggingperiod)
  
 except KeyboardInterrupt:
   pass
