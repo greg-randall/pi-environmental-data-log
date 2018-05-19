@@ -4,7 +4,7 @@ import os
 from ftplib import FTP
 from ftpconfig import * #credentials for ftp. done this way to keep them from getting added to git
 
-#make sure our folders are setup
+#make sure our local folders are setup
 if not os.path.isdir("data"):
   os.mkdir("data")
   os.mkdir("data/upload")
@@ -14,6 +14,7 @@ else:
     os.mkdir("data/upload")
   if not os.path.isdir("data/uploaded"):
     os.mkdir("data/uploaded")
+
 
 try:
   while True: #loop forever
@@ -25,6 +26,7 @@ try:
         ftp = FTP()
         ftp.connect(SERVER, PORT)
         ftp.login(USER, PASS)
+
 
         #get list of files on the ftp server to see if the folder we need to upload to exisits
         filelist = []
@@ -40,16 +42,23 @@ try:
           ftp.mkd('pi-env-data')
           ftp.cwd('pi-env-data')
 
-        for f in filestoupload: #loop through the files we need to upload
-          if opath.rpartition('.')[-1] == "csv": 
-            print f + "\n" #list the file we're currently uploading
-            ftp.storbinary('STOR ' + f, open("data/upload/" + f)) #upload the file
-            os.rename("data/upload/" + f,"data/uploaded/" + f) #move the file we just uploaded into the uploaded directory
-        ftp.close() #after all of the uploads close the ftp connection
-      except:
-        print "Could not access " + SERVER + ". Will retry shortly." #if we can't get to the server then list that it failed
 
-    print "Waiting 30 seconds. Current time: " + datetime.now().strftime("%H:%M:%S.%f") #wait statment before checking for new files to upload, time is there to help debugging
+
+
+        for f in filestoupload: #loop through the files we need to upload
+          print "Uploading: " + f #list the file we're currently uploading
+          ftp.storbinary('STOR ' + f, open("data/upload/" + f)) #upload the file
+          os.rename("data/upload/" + f,"data/uploaded/" + f) #move the file we just uploaded into the uploaded directory
+
+
+
+ 
+        ftp.close() #after all of the uploads close the ftp connection
+
+      except:
+        print "\nCould not access " + SERVER + ". Will retry shortly." #if we can't get to the server then list that it failed
+
+    print "Waiting 30 seconds. Current time: " + datetime.now().strftime("%H:%M:%S") + "\n" #wait statment before checking for new files to upload
     time.sleep(30) #wait until we check the folders again
 except KeyboardInterrupt:
   ftp.close()
