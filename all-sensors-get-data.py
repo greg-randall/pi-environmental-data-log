@@ -37,8 +37,23 @@ enviromentalsensor.select_gas_heater_profile(0)
 
 ##########################################################
 
+#get the serial number of the raspberry pi's cpu to uniquely id the raspberry pi.
+try:
+  f = open('/proc/cpuinfo','r')
+  for line in f:
+    if line[0:6]=='Serial':
+      cpuserial = line[10:26]
+      break
+  f.close()
+except:
+  cpuserial = "ERROR000000000"
+
+print cpuserial
+
+##########################################################
+
 #create and print the headers. headers are used below in the log file creation
-headers = "time (central), date, cpu temperature C, temperature C, pressure kPa, %RH, voc ohm, visible light lux, infrared light lux, sound dBa\n"
+headers = "time (central), date, cpu temperature C, temperature C, pressure kPa, %RH, voc ohm, visible light lux, infrared light lux, sound dBa, serial: " + cpuserial + "\n" 
 print headers
 
 ##########################################################
