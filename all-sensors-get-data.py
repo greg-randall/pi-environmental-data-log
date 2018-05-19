@@ -127,6 +127,6 @@ try: #keeps us from having ugly errors when we kill the process
       time.sleep(loggingperiod) #if it's not time to split the file wait the normal amount of time
 
 except KeyboardInterrupt:
-  pass
+  outputfile.close()
 
-outputfile.close()
+
