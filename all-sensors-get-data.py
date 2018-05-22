@@ -6,9 +6,6 @@ import Adafruit_ADS1x15
 from datetime import datetime #for the microseconds time
 import time #general timing of the program
 import os #creating/renaming files and folders
-#from ftplib import FTP
-#import sys
-#from ftpconfig import * #credentials for ftp. done this way to keep them from getting added to git
 from loggingperiodconfig import * #configuration information for how often to split the log file and how many readings to make per time
 
 ##########################################################
