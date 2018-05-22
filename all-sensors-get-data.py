@@ -45,8 +45,6 @@ try:
 except:
   cpuserial = "ERROR000000000"
 
-print cpuserial
-
 ##########################################################
 
 #create and print the headers. headers are used below in the log file creation
