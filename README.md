@@ -27,13 +27,14 @@ Gravity Sound Level Meter | Decibel meter that outputs voltage uses ADS1015 | ht
 ---
 
 **Making one big CSV**
+
 For analysis of your data you'll probably need to combine all your split files into a single CSV. For Linux/Mac here's how it do it (if you're on Windows install Cygwin before you follow these directions):
 
-1. Cd to the folder where your've put your csv files. 
+1. Cd to the folder where you've put your CSV files. 
 2. Combine all your files into a single file: cat *.csv > all.csv 
 3. Remove all the CSV headers that will be sprinkled throughout the file: grep -i -v 'serial' all-files.csv > all-files-no-headers.csv
 4. Discover if the system lost power during your data collection: grep -i -B2 -A2 'restart' all-files-no-headers.csv
-5. If there are reboots look the line preceeding "system restarted" and see if the data is complete. Typically during a power loss there will only be a partial line of data, if the system shut down gracefully you should get a complete line of data. Most people will want to delete partial lines of data: sed -n '/system restarted/{n;x;d;};x;1d;p;${x;p;}' all-files-no-headers.csv  > all-files-no-headers-reboot-cleaned.csv  (see https://stackoverflow.com/a/7378865/4896819 for more information on this sed command)
+5. If there are reboots look the line preceding "system restarted" and see if the data is complete. Typically during a power loss there will only be a partial line of data, if the system shut down gracefully you should get a complete line of data. Most people will want to delete partial lines of data: sed -n '/system restarted/{n;x;d;};x;1d;p;${x;p;}' all-files-no-headers.csv  > all-files-no-headers-reboot-cleaned.csv  (see https://stackoverflow.com/a/7378865/4896819 for more information on this sed command)
 6. If you need the header back at the top of your combined csv file take one of your source log files and run the following command on it: sed -n '1p;' log_05-24-2018_16-54-55.csv | cat - all-files-no-headers-reboot-cleaned.csv > final-combined-cleaned.csv
 
 ---
